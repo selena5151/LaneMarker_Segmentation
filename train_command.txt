@@ -1,0 +1,9 @@
+python train_net.py --config-file configs/roadmarking/swin/lawin/lawin_maskformer_swin_small_bs16_90k.yaml --num-gpus 2 SOLVER.IMS_PER_BATCH 8 SOLVER.BASE_LR 0.001 OUTPUT_DIR output/lawinsmall_batch8_paper_cv_ftl_bike
+
+python demo/demo.py --config-file configs/roadmarking/swin/lawin/lawin_maskformer_swin_small_bs16_90k.yaml --input detect_image/input/road_detect/*.jpg  --output detect_image/out/lawinsmall_batch8_paper_v2/ --opts MODEL.WEIGHTS output/lawinsmall_batch8_paper_v2/model_final.pth
+
+python demo/demo.py --config-file configs/roadmarking/swin/lawin/lawin_maskformer_swin_small_bs16_90k.yaml --input datasets/my_roadmarking/images/val/*.jpg  --output detect_image/out/val_cv_opening/ --opts MODEL.WEIGHTS output/lawinsmall_batch8_paper_cv_opening_sinword/model_final.pth
+
+python demo/demo.py --config-file configs/roadmarking/swin/lawin/lawin_maskformer_swin_small_bs16_90k.yaml --input 'datasets/my_roadmarking/images/val/Section 4, Xinglong Road, Cultural District, Taipei City_Section 2, Zhongshun Street 80 meters_C_background.jpg'  --output detect_image/out/ftl_133_7_3/ --opts MODEL.WEIGHTS output/ftl/ftl_133_7_3/model_final.pth
+
+python train_net.py --config-file configs/roadmarking/swin/lawin/lawin_maskformer_swin_small_bs16_90k.yaml --num-gpus 2 --eval-only MODEL.WEIGHTS output/lawinsmall_batch8_paper_cv_ftl_opening_sinword/model_final.pth SOLVER.IMS_PER_BATCH 8 SOLVER.BASE_LR 0.001 OUTPUT_DIR output/eval/
