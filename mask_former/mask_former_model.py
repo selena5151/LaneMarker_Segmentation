@@ -16,7 +16,7 @@ from .modeling.criterion import SetCriterion
 from .modeling.matcher import HungarianMatcher
 
 from refine_contour import ImageProcessor
-# from refine_contour_arrow import ImageProcessor
+from refine_contour_arrow import ArrowProcessor
 
 @META_ARCH_REGISTRY.register()
 class MaskFormer(nn.Module):
@@ -97,8 +97,12 @@ class MaskFormer(nn.Module):
             cost_dice=1,
         )
 
-        # weight_dict = {"loss_ce": 1, "loss_mask": mask_weight, "loss_dice": dice_weight, "loss_focal_tversky": 1}
-        weight_dict = {"loss_ce": 1, "loss_mask": mask_weight, "loss_dice": dice_weight}
+        # add focal_tversky_loss
+        weight_dict = {"loss_ce": 1, "loss_mask": mask_weight, "loss_dice": dice_weight, "loss_focal_tversky": 1}
+
+        # origin loss
+        # weight_dict = {"loss_ce": 1, "loss_mask": mask_weight, "loss_dice": dice_weight}
+
         if deep_supervision:
             dec_layers = cfg.MODEL.MASK_FORMER.DEC_LAYERS
             aux_weight_dict = {}
@@ -219,14 +223,15 @@ class MaskFormer(nn.Module):
                     r = sem_seg_postprocess(r, image_size, height, width)
                 
                 processor = ImageProcessor()
-                # use opencv
+                arrow_processor = ArrowProcessor()
+                # refine origin road marking
                 # r = processor.opencv_fitimg(input_per_image["image"], r)
-                # use opencv with no word label
-                # r = processor.noword_fitimg(input_per_image["image"], r)
-                # use opencv with single word label
-                # r = processor.singleword_fitimg(input_per_image["image"], r)
-                # use opencv with single arrow label
-                # r = processor.arrow_fitimg(input_per_image["image"], r)
+
+                # refine single_word road marking
+                r = processor.singleword_fitimg(input_per_image["image"], r)
+
+                # refine single_arrow road marking
+                # r = arrow_processor.arrow_fitimg(input_per_image["image"], r)
 
                 processed_results.append({"sem_seg": r})
 

@@ -1,4 +1,6 @@
-# 只計算前景與背景的iou
+"""
+calculate foreground markers iou
+"""
 # Copyright (c) Facebook, Inc. and its affiliates.
 import itertools
 import json

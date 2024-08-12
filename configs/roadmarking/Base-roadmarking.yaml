@@ -14,6 +14,8 @@ MODEL:
     # NORM: "SyncBN"
     RES5_MULTI_GRID: [1, 1, 1]  # not used
 DATASETS:
+  # TRAIN: ("my_roadmarking_train",)
+  # TEST: ("my_roadmarking__val",)
   TRAIN: ("singleword_roadmarking_train",)
   TEST: ("singleword_roadmarking_val",)
   # TRAIN: ("arrow_roadmarking_train",)
@@ -52,7 +54,6 @@ INPUT:
   DATASET_MAPPER_NAME: "mask_former_semantic"
 TEST:
   EVAL_PERIOD: 300
-  # EVAL_PERIOD: 30
   AUG:
     ENABLED: False
     MIN_SIZES: [512, 1080]

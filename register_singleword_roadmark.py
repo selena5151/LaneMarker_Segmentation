@@ -1,3 +1,6 @@
+"""
+register road marking dataset with single word label
+"""
 import os
 import json
 import cv2
@@ -11,7 +14,7 @@ class CustomDataset:
         self.split = split
         self.json_dir = os.path.join(data_dir, "labels", split)
         self.singleword_dir = os.path.join(data_dir, "singleWord_label", split)
-        # self.singleword_dir = os.path.join(data_dir, "bike_label", split)
+        # self.singleword_dir = os.path.join(data_dir, "bike_label", split) # bike_lane with two line not area
         self.image_dir = os.path.join(data_dir, "images", split)
         self.load_annotations()
         

@@ -1,17 +1,18 @@
+"""
+refine contour for single word and arrow dataset
+"""
 import cv2
 import numpy as np
 import torch
 from arrow import ArrowDetector
-# from arrow_edit import ArrowDetector
 from crf import apply_crf
 
-class ImageProcessor:
+class ArrowProcessor:
     def __init__(self):
         self.arrow = {2}
         self.area = {8, 11, 14, 18}
         self.line = {5, 13} 
         self.singleword = [20]
-
 
     @staticmethod
     def min_area_rect_mask(binary_mask):
@@ -39,11 +40,10 @@ class ImageProcessor:
             rect_area = cv2.contourArea(box)
             contour_area = cv2.contourArea(c)
         
-            # 如果minarea範圍並沒有範圍大於原始contour太多就用這個
+            # if minarea<=1.5 origin contour
             if rect_area <= 1.5 * contour_area:
                 cv2.drawContours(mask_with_rect, [box], -1, (255, 255, 255), cv2.FILLED)
             else:
-                # 如果minarea範圍大於原始contour太多就用這個
                 epsilon = 0.01 * cv2.arcLength(c, True)
                 approx_polygon = cv2.approxPolyDP(c, epsilon, True)
                 selected_vertices = [approx_polygon[i] for i in range(len(approx_polygon))]

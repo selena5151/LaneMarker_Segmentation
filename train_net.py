@@ -23,13 +23,13 @@ from detectron2.evaluation import  CityscapesInstanceEvaluator,CityscapesSemSegE
 from detectron2.projects.deeplab import add_deeplab_config, build_lr_scheduler
 from detectron2.solver.build import maybe_add_gradient_clipping
 from detectron2.utils.logger import setup_logger
-from register_roadmark import register_custom_dataset  # Import roaddataset registration function
-from register_singleword_roadmark import register_singleword_dataset  # Import single word roaddataset registration function
-from register_arrow_roadmark import register_arrow_dataset  # Import arrow roaddataset registration function
+from register_roadmark import register_custom_dataset  # roaddataset registertion
+from register_singleword_roadmark import register_singleword_dataset  # single word roaddataset registertion
+from register_arrow_roadmark import register_arrow_dataset  # arrow roaddataset registertion
 # MaskFormer
 from mask_former import DETRPanopticDatasetMapper, MaskFormerPanopticDatasetMapper, MaskFormerSemanticDatasetMapper, SemanticSegmentorWithTTA, add_mask_former_config
 
-# 假設你的評估器位於 binary_iou_evaluator.py
+# foreground evaluation
 from binary_evaluation import BinaryIoUEvaluator
 
 
@@ -96,6 +96,7 @@ class Trainer(DefaultTrainer):
             assert (
                 torch.cuda.device_count() >= comm.get_rank()
             ), "CustomEvaluator currently do not work with multiple machines."
+            evaluator_list.append(SemSegEvaluator(dataset_name))
         if evaluator_type == "binary_iou":
             assert (
                 torch.cuda.device_count() >= comm.get_rank()

@@ -1,3 +1,6 @@
+"""
+register road marking dataset with single word label and single arrow label
+"""
 import os
 import json
 import cv2

@@ -1,15 +1,19 @@
+"""
+refine contour
+origin: each word with unique label
+singleword: word in same label
+"""
 import cv2
 import numpy as np
 import torch
 from arrow import ArrowDetector
-# from arrow_edit import ArrowDetector
 from crf import apply_crf
 
 class ImageProcessor:
     def __init__(self):
+        # dictionary={singleword_labelid : origin_labelid}
         self.arrow = {2: 5, 10: 20, 16: 36, 17: 37, 20: 43, 22: 49, 24: 51, 25: 56}
         self.area = {8: 18, 12: 23, 15: 32, 23: 50}
-        # self.line = {4: 10, 5: 11, 11: 22, 13: 25, 14: 27, 19: 42}
         self.line = {5: 11, 13: 25, 14: 27, 19: 42} #without double line
         self.curve = {26: 64}
         self.word = [1, 3, 4, 7, 8, 9, 13, 15, 16, 17, 21, 24, 26, 28, 29,
@@ -44,11 +48,10 @@ class ImageProcessor:
             rect_area = cv2.contourArea(box)
             contour_area = cv2.contourArea(c)
         
-            # 如果minarea範圍並沒有範圍大於原始contour太多就用這個
+            # if minarea<=1.5 origin contour
             if rect_area <= 1.5 * contour_area:
                 cv2.drawContours(mask_with_rect, [box], -1, (255, 255, 255), cv2.FILLED)
             else:
-                # 如果minarea範圍大於原始contour太多就用這個
                 epsilon = 0.01 * cv2.arcLength(c, True)
                 approx_polygon = cv2.approxPolyDP(c, epsilon, True)
                 selected_vertices = [approx_polygon[i] for i in range(len(approx_polygon))]
@@ -56,27 +59,8 @@ class ImageProcessor:
         return mask_with_rect if contours else binary_mask
 
     @staticmethod
-    def dilate_and(img, mask):
-        img = img.detach().cpu().numpy()
-        h = mask.shape[0]
-        w = mask.shape[1]
-        img = np.transpose(img, (1, 2, 0))
-        img = cv2.resize(img, (w, h))
-        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img_gray = (img_gray * 255).astype(np.uint8)
-        thresh, binaryImage = cv2.threshold(img_gray, 128, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-        # Dilate:
-        kernel_img = np.ones((5, 5), np.uint8)
-        binaryImage = cv2.morphologyEx(binaryImage, cv2.MORPH_DILATE, kernel_img, iterations=2)
-
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
-        mask_dilate = cv2.dilate(mask, kernel)
-        mask_result = cv2.bitwise_and(binaryImage, mask_dilate)
-        return mask_result
-
-    @staticmethod
     def pre_crf(img, r):
+        #use crf to refine arrow
         np_r = r.detach().cpu().numpy()
         img = img.detach().cpu().numpy()
         img = np.transpose(img, (1, 2, 0))
@@ -88,10 +72,9 @@ class ImageProcessor:
     def get_key(dict, value):
         return [k for k, v in dict.items() if v == value]
 
-    def process_fitimg(self, ori_img, r, process_type="origin"):
+    def process_fitimg(self, ori_img, r, process_type="singleword"):
         device = r.device
         crf_pre = self.pre_crf(ori_img, r)
-        # max_cls = self.pre_crf(ori_img, r)
         max_cls = r.argmax(dim=0).detach().cpu()
 
         pred = np.array(max_cls, dtype=int)
@@ -111,9 +94,6 @@ class ImageProcessor:
                 else:
                     mapped_id = -1
                 use_word = "origin"
-            elif process_type == "noword":
-                mapped_id = class_id
-                use_word = "no"
             elif process_type == "singleword":
                 mapped_id = class_id
                 use_word = "single"
@@ -143,7 +123,7 @@ class ImageProcessor:
                 min_line = self.min_area_rect_mask(opening)
                 refined_r[class_id] = torch.tensor(min_line, device=device).float() / 255
             elif mapped_id in self.arrow:
-                # #arrow template
+                # #arrow template with opencv matchtemplate
                 # arrow_detector = ArrowDetector(f'template/{self.arrow[mapped_id]}.PNG')
                 # arrow_area = arrow_detector.rotate_match(binary_mask)
                 # arrow_area = arrow_detector.draw_and_replace_arrows(binary_mask, arrow_area)
@@ -171,9 +151,6 @@ class ImageProcessor:
 
     def opencv_fitimg(self, ori_img, r):
         return self.process_fitimg(ori_img, r, process_type="origin")
-
-    def noword_fitimg(self, ori_img, r):
-        return self.process_fitimg(ori_img, r, process_type="noword")
 
     def singleword_fitimg(self, ori_img, r):
         return self.process_fitimg(ori_img, r, process_type="singleword")
