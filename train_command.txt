@@ -1,5 +1,0 @@
-#command
-
-python train_net.py --config-file configs/roadmarking/swin/lawin/lawin_maskformer_swin_small_bs16_90k.yaml --num-gpus 2 SOLVER.IMS_PER_BATCH 8 SOLVER.BASE_LR 0.001 OUTPUT_DIR output/lawinsmall_batch8_paper_arrow
-
-python demo/demo.py --config-file configs/roadmarking/swin/lawin/lawin_maskformer_swin_small_bs16_90k.yaml --input detect_image/input/road_detect/*.jpg  --output detect_image/out/lawinsmall_batch8_paper_ftl_arrow/ --opts MODEL.WEIGHTS output/lawinsmall_batch8_paper_ftl_arrow/model_final.pth
