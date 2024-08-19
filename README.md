@@ -7,13 +7,16 @@ Lane marker sementic segmentation base on [Lawin Transformer](https://github.com
 
 Creating a new environment with Anaconda.
 ```
+cd lawin
 conda env create -f lawin.yaml --name lawin
 conda activate lawin
 ```
 Install [Detectron2](https://github.com/facebookresearch/detectron2?tab=readme-ov-file)
 ```
+cd ..
 git clone https://github.com/facebookresearch/detectron2.git
 python -m pip install -e detectron2
+pip install git+https://github.com/lucasb-eyer/pydensecrf.git
 ```
 
 ## Datasets
