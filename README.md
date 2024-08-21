@@ -11,7 +11,7 @@ cd lawin
 conda env create -f lawin.yaml --name lawin
 conda activate lawin
 ```
-Install [Detectron2](https://github.com/facebookresearch/detectron2?tab=readme-ov-file)
+Install [Detectron2](https://github.com/facebookresearch/detectron2?tab=readme-ov-file) and [PyDenseCRF](https://github.com/lucasb-eyer/pydensecrf)
 ```
 cd ..
 git clone https://github.com/facebookresearch/detectron2.git
