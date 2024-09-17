@@ -1,4 +1,4 @@
-# Lane marker segmentation based on Lawin Transformer
+# Lane marker segmentation based on Transformer
 
 Lane marker sementic segmentation base on [Lawin Transformer](https://github.com/yan-hao-tian/VW/tree/master/MaskFormer) [[paper](https://arxiv.org/abs/2201.01615)].
 
